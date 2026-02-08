@@ -46,7 +46,7 @@ export class AIService {
       throw new Error(`OpenAI API error: ${error}`);
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     return data.choices[0].message.content;
   }
 
@@ -72,7 +72,7 @@ export class AIService {
       throw new Error(`Anthropic API error: ${error}`);
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     return data.content[0].text;
   }
 
