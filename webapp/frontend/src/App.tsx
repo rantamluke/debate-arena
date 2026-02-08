@@ -4,6 +4,7 @@ import DebateChat from './components/DebateChat'
 import TopicSidebar from './components/TopicSidebar'
 import TopicSelection from './components/TopicSelection'
 import StatsPage from './components/StatsPage'
+import ResultsModal from './components/ResultsModal'
 import { startDebate, sendMessage, endDebate, getStats } from './api/client'
 
 type View = 'home' | 'debate' | 'stats'
@@ -28,6 +29,8 @@ function App() {
     currentStreak: 0
   })
   const [loading, setLoading] = useState(false)
+  const [showResults, setShowResults] = useState(false)
+  const [debateResults, setDebateResults] = useState<any>(null)
 
   // Load stats on mount
   useEffect(() => {
@@ -123,25 +126,12 @@ function App() {
     try {
       const results = await endDebate(debateId, messages)
       
-      // Show results
-      const resultsMessage: Message = {
-        id: 'results',
-        type: 'system',
-        content: formatResults(results),
-        timestamp: Date.now()
-      }
-      
-      setMessages(prev => [...prev, resultsMessage])
+      // Show results in modal
+      setDebateResults(results)
+      setShowResults(true)
       
       // Reload stats
       await loadStats()
-      
-      // Show new debate option after a delay
-      setTimeout(() => {
-        if (confirm('Debate complete! Start a new one?')) {
-          handleNewDebate()
-        }
-      }, 3000)
     } catch (error) {
       console.error('Failed to end debate:', error)
       alert('Failed to end debate. Please try again.')
@@ -149,30 +139,11 @@ function App() {
       setLoading(false)
     }
   }
-
-  const formatResults = (results: any) => {
-    const { judges, averageScores, voteBreakdown, winner, eloChange } = results
-    
-    return `🏆 **DEBATE COMPLETE!**
-
-**Winner:** ${winner === 'user' ? 'YOU WIN! 🎉' : winner === 'opponent' ? 'Opponent Wins' : 'TIE'}
-
-**Judge Votes:**
-Human: ${voteBreakdown.human} | AI: ${voteBreakdown.ai} | Tie: ${voteBreakdown.tie}
-
-**Average Scores:**
-Logic: ${averageScores.logic}/10
-Evidence: ${averageScores.evidence}/10
-Rhetoric: ${averageScores.rhetoric}/10
-
-**Elo Change:** ${eloChange > 0 ? '+' : ''}${eloChange}
-
-**Judge Feedback:**
-${judges.map((j: any, i: number) => `
-${i + 1}. ${j.name}
-   Logic: ${j.scores.logic} | Evidence: ${j.scores.evidence} | Rhetoric: ${j.scores.rhetoric}
-   "${j.feedback}"`).join('\n')}
-`
+  
+  const handleCloseResults = () => {
+    setShowResults(false)
+    setDebateResults(null)
+    handleNewDebate()
   }
 
   const handleNewDebate = () => {
@@ -226,54 +197,83 @@ ${i + 1}. ${j.name}
   // Stats view
   if (view === 'stats') {
     return (
-      <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
-        <Header elo={stats.elo} />
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <Navigation />
-          <StatsPage />
+      <>
+        <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
+          <Header elo={stats.elo} onStatsClick={() => setView("stats")} />
+          <div className="max-w-7xl mx-auto px-4 py-6">
+            <Navigation />
+            <StatsPage />
+          </div>
         </div>
-      </div>
+        {showResults && debateResults && (
+          <ResultsModal
+            isOpen={showResults}
+            onClose={handleCloseResults}
+            results={debateResults}
+          />
+        )}
+      </>
     );
   }
 
   // Debate view
   if (view === 'debate' && debateActive) {
     return (
-      <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
-        <Header elo={stats.elo} />
-        
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <Navigation />
+      <>
+        <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
+          <Header elo={stats.elo} onStatsClick={() => setView("stats")} />
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <TopicSidebar 
-              currentTopic={currentTopic}
-              stats={stats}
-              onForfeit={handleForfeit}
-            />
+          <div className="max-w-7xl mx-auto px-4 py-6">
+            <Navigation />
             
-            <div className="lg:col-span-2">
-              <DebateChat 
-                messages={messages}
-                onSendMessage={handleSendMessage}
-                userPosition={currentTopic?.position}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <TopicSidebar 
+                currentTopic={currentTopic}
+                stats={stats}
+                onForfeit={handleForfeit}
               />
+              
+              <div className="lg:col-span-2">
+                <DebateChat 
+                  messages={messages}
+                  onSendMessage={handleSendMessage}
+                  userPosition={currentTopic?.position}
+                  currentRound={currentTopic?.round}
+                  totalRounds={currentTopic?.totalRounds}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+        {showResults && debateResults && (
+          <ResultsModal
+            isOpen={showResults}
+            onClose={handleCloseResults}
+            results={debateResults}
+          />
+        )}
+      </>
     );
   }
 
   // Home view (topic selection)
   return (
-    <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
-      <Header elo={stats.elo} />
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <Navigation />
-        <TopicSelection onSelectTopic={handleSelectTopic} />
+    <>
+      <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
+        <Header elo={stats.elo} onStatsClick={() => setView("stats")} />
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <Navigation />
+          <TopicSelection onSelectTopic={handleSelectTopic} />
+        </div>
       </div>
-    </div>
+      {showResults && debateResults && (
+        <ResultsModal
+          isOpen={showResults}
+          onClose={handleCloseResults}
+          results={debateResults}
+        />
+      )}
+    </>
   );
 }
 

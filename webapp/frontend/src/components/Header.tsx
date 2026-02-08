@@ -1,8 +1,9 @@
 interface HeaderProps {
   elo: number
+  onStatsClick?: () => void
 }
 
-export default function Header({ elo }: HeaderProps) {
+export default function Header({ elo, onStatsClick }: HeaderProps) {
   return (
     <header className="border-b border-white/10 backdrop-blur-lg bg-black/20">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -18,9 +19,14 @@ export default function Header({ elo }: HeaderProps) {
             <div className="text-sm text-gray-400">Your Elo</div>
             <div className="text-2xl font-bold text-yellow-400">{elo}</div>
           </div>
-          <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition">
-            📊 Stats
-          </button>
+          {onStatsClick && (
+            <button 
+              onClick={onStatsClick}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition"
+            >
+              📊 Stats
+            </button>
+          )}
         </div>
       </div>
     </header>

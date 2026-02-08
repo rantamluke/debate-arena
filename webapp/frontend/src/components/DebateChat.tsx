@@ -13,9 +13,11 @@ interface DebateChatProps {
   messages: Message[]
   onSendMessage: (content: string) => void
   userPosition?: 'FOR' | 'AGAINST'
+  currentRound?: number
+  totalRounds?: number
 }
 
-export default function DebateChat({ messages, onSendMessage, userPosition = 'FOR' }: DebateChatProps) {
+export default function DebateChat({ messages, onSendMessage, userPosition = 'FOR', currentRound = 1, totalRounds = 4 }: DebateChatProps) {
   const [inputValue, setInputValue] = useState('')
   const [isOpponentTyping, setIsOpponentTyping] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState(90)
@@ -59,6 +61,18 @@ export default function DebateChat({ messages, onSendMessage, userPosition = 'FO
 
   return (
     <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 h-[calc(100vh-200px)] flex flex-col">
+      {/* Round Counter Header */}
+      <div className="border-b border-white/10 px-6 py-3 bg-gradient-to-r from-purple-900/50 to-blue-900/50">
+        <div className="flex justify-between items-center">
+          <div className="text-lg font-semibold">
+            🎯 Round {currentRound} of {totalRounds}
+          </div>
+          <div className="text-sm text-gray-400">
+            {currentRound <= totalRounds ? 'In Progress' : 'Complete'}
+          </div>
+        </div>
+      </div>
+      
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.map(message => (
