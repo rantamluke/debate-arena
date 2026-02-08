@@ -3,7 +3,10 @@ import Header from './components/Header'
 import DebateChat from './components/DebateChat'
 import TopicSidebar from './components/TopicSidebar'
 import TopicSelection from './components/TopicSelection'
+import StatsPage from './components/StatsPage'
 import { startDebate, sendMessage, endDebate, getStats } from './api/client'
+
+type View = 'home' | 'debate' | 'stats'
 
 interface Message {
   id: string
@@ -13,6 +16,7 @@ interface Message {
 }
 
 function App() {
+  const [view, setView] = useState<View>('home')
   const [debateActive, setDebateActive] = useState(false)
   const [debateId, setDebateId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -62,6 +66,7 @@ function App() {
       }])
       
       setDebateActive(true)
+      setView('debate')
     } catch (error) {
       console.error('Failed to start debate:', error)
       alert('Failed to start debate. Please try again.')
@@ -173,6 +178,7 @@ ${i + 1}. ${j.name}
     setDebateId(null)
     setMessages([])
     setCurrentTopic(null)
+    setView('home')
   }
 
   const handleForfeit = () => {
@@ -189,35 +195,83 @@ ${i + 1}. ${j.name}
     )
   }
 
-  if (!debateActive) {
+  // Navigation component
+  const Navigation = () => (
+    <div className="flex justify-center gap-4 mb-6">
+      <button
+        onClick={() => setView('home')}
+        className={`px-6 py-3 rounded-lg font-semibold transition ${
+          view === 'home'
+            ? 'bg-gradient-to-r from-purple-600 to-blue-600'
+            : 'bg-gray-800 hover:bg-gray-700'
+        }`}
+      >
+        🥊 New Debate
+      </button>
+      <button
+        onClick={() => setView('stats')}
+        className={`px-6 py-3 rounded-lg font-semibold transition ${
+          view === 'stats'
+            ? 'bg-gradient-to-r from-purple-600 to-blue-600'
+            : 'bg-gray-800 hover:bg-gray-700'
+        }`}
+      >
+        📊 Stats
+      </button>
+    </div>
+  );
+
+  // Stats view
+  if (view === 'stats') {
     return (
       <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
         <Header elo={stats.elo} />
-        <TopicSelection onSelectTopic={handleSelectTopic} />
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <Navigation />
+          <StatsPage />
+        </div>
       </div>
-    )
+    );
   }
 
+  // Debate view
+  if (view === 'debate' && debateActive) {
+    return (
+      <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
+        <Header elo={stats.elo} />
+        
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <Navigation />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <TopicSidebar 
+              currentTopic={currentTopic}
+              stats={stats}
+              onForfeit={handleForfeit}
+            />
+            
+            <div className="lg:col-span-2">
+              <DebateChat 
+                messages={messages}
+                onSendMessage={handleSendMessage}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Home view (topic selection)
   return (
     <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
       <Header elo={stats.elo} />
-      
-      <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <TopicSidebar 
-          currentTopic={currentTopic}
-          stats={stats}
-          onForfeit={handleForfeit}
-        />
-        
-        <div className="lg:col-span-2">
-          <DebateChat 
-            messages={messages}
-            onSendMessage={handleSendMessage}
-          />
-        </div>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <Navigation />
+        <TopicSelection onSelectTopic={handleSelectTopic} />
       </div>
     </div>
-  )
+  );
 }
 
 export default App

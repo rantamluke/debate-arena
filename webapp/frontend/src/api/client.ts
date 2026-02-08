@@ -58,11 +58,38 @@ export interface UserStats {
   totalDebates: number
   wins: number
   losses: number
+  ties: number
   winRate: number
   currentStreak: number
-  topicMastery: Record<string, {
+  averageScores: {
+    logic: number
+    evidence: number
+    rhetoric: number
+  }
+  trends: {
+    logic: number
+    evidence: number
+    rhetoric: number
+  }
+  topicMastery: Array<{
+    category: string
     debates: number
+    wins: number
     winRate: number
+    avgScore: number
+  }>
+  history: Array<{
+    id: number
+    topic: string
+    category: string
+    position: string
+    outcome: string
+    scores: {
+      logic: number
+      evidence: number
+      rhetoric: number
+    } | null
+    date: string
   }>
 }
 

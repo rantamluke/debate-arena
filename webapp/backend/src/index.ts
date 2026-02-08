@@ -219,11 +219,55 @@ app.post('/api/debate/end', async (req, res) => {
  */
 app.get('/api/stats', (req, res) => {
   const stats = debateEngine.getStats();
+  const recentDebates = debateEngine.getRecentDebates(20);
+  
+  // Calculate average scores across all debates
+  const debatesWithScores = recentDebates.filter(d => d.results?.averageScores);
+  const avgScores = debatesWithScores.length > 0 ? {
+    logic: Math.round(debatesWithScores.reduce((sum, d) => sum + (d.results.averageScores.logic || 0), 0) / debatesWithScores.length * 10) / 10,
+    evidence: Math.round(debatesWithScores.reduce((sum, d) => sum + (d.results.averageScores.evidence || 0), 0) / debatesWithScores.length * 10) / 10,
+    rhetoric: Math.round(debatesWithScores.reduce((sum, d) => sum + (d.results.averageScores.rhetoric || 0), 0) / debatesWithScores.length * 10) / 10
+  } : { logic: 0, evidence: 0, rhetoric: 0 };
+  
+  // Calculate trends (last 5 vs previous 5)
+  const last5 = debatesWithScores.slice(0, 5);
+  const prev5 = debatesWithScores.slice(5, 10);
+  
+  const last5Avg = last5.length > 0 ? {
+    logic: last5.reduce((sum, d) => sum + (d.results.averageScores.logic || 0), 0) / last5.length,
+    evidence: last5.reduce((sum, d) => sum + (d.results.averageScores.evidence || 0), 0) / last5.length,
+    rhetoric: last5.reduce((sum, d) => sum + (d.results.averageScores.rhetoric || 0), 0) / last5.length
+  } : null;
+  
+  const prev5Avg = prev5.length > 0 ? {
+    logic: prev5.reduce((sum, d) => sum + (d.results.averageScores.logic || 0), 0) / prev5.length,
+    evidence: prev5.reduce((sum, d) => sum + (d.results.averageScores.evidence || 0), 0) / prev5.length,
+    rhetoric: prev5.reduce((sum, d) => sum + (d.results.averageScores.rhetoric || 0), 0) / prev5.length
+  } : null;
+  
+  const trends = (last5Avg && prev5Avg) ? {
+    logic: Math.round((last5Avg.logic - prev5Avg.logic) * 10) / 10,
+    evidence: Math.round((last5Avg.evidence - prev5Avg.evidence) * 10) / 10,
+    rhetoric: Math.round((last5Avg.rhetoric - prev5Avg.rhetoric) * 10) / 10
+  } : { logic: 0, evidence: 0, rhetoric: 0 };
+  
+  // Format debate history
+  const history = recentDebates.map(d => ({
+    id: d.id,
+    topic: d.topic,
+    category: d.category,
+    position: d.humanPosition,
+    outcome: d.results?.outcome || 'INCOMPLETE',
+    scores: d.results?.averageScores || null,
+    date: d.completedAt || d.startedAt
+  }));
   
   const topicMasteryArray = Object.entries(stats.topicMastery).map(([category, data]: [string, any]) => ({
     category,
     debates: data.debates,
-    winRate: data.debates > 0 ? Math.round((data.wins / data.debates) * 100) : 0
+    wins: data.wins,
+    winRate: data.debates > 0 ? Math.round((data.wins / data.debates) * 100) : 0,
+    avgScore: data.avgScore
   }));
   
   res.json({
@@ -231,12 +275,13 @@ app.get('/api/stats', (req, res) => {
     totalDebates: stats.totalDebates,
     wins: stats.wins,
     losses: stats.losses,
+    ties: stats.ties,
     winRate: stats.totalDebates > 0 ? Math.round((stats.wins / stats.totalDebates) * 100) : 0,
     currentStreak: 0, // TODO: Calculate from recent debates
-    topicMastery: topicMasteryArray.reduce((acc, tm) => {
-      acc[tm.category] = { debates: tm.debates, winRate: tm.winRate };
-      return acc;
-    }, {} as Record<string, any>)
+    averageScores: avgScores,
+    trends,
+    topicMastery: topicMasteryArray,
+    history
   });
 });
 
