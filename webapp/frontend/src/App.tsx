@@ -31,6 +31,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [debateResults, setDebateResults] = useState<any>(null)
+  const [debateEnding, setDebateEnding] = useState(false)
 
   // Load stats on mount
   useEffect(() => {
@@ -79,7 +80,7 @@ function App() {
   }
 
   const handleSendMessage = async (content: string) => {
-    if (!debateId) return
+    if (!debateId || debateEnding) return
     
     const newMessage: Message = {
       id: Date.now().toString(),
@@ -110,7 +111,8 @@ function App() {
       
       // Check if debate is complete (after both user and AI have argued)
       // We've just added the AI's response, so check if we've reached total rounds
-      if (newRound > currentTopic.totalRounds) {
+      if (newRound > currentTopic.totalRounds && !debateEnding) {
+        setDebateEnding(true)
         setTimeout(() => handleEndDebate(), 2000)
       }
     } catch (error) {
@@ -120,7 +122,10 @@ function App() {
   }
 
   const handleEndDebate = async () => {
-    if (!debateId) return
+    if (!debateId || debateEnding === false) return
+    
+    // Prevent multiple calls
+    if (showResults) return
     
     setLoading(true)
     try {
@@ -134,6 +139,7 @@ function App() {
       await loadStats()
     } catch (error) {
       console.error('Failed to end debate:', error)
+      setDebateEnding(false) // Reset flag on error so user can retry
       alert('Failed to end debate. Please try again.')
     } finally {
       setLoading(false)
@@ -151,6 +157,7 @@ function App() {
     setDebateId(null)
     setMessages([])
     setCurrentTopic(null)
+    setDebateEnding(false)
     setView('home')
   }
 
