@@ -13,7 +13,9 @@ export interface Topic {
 
 export interface DebateSession {
   id: string
-  topic: Topic
+  topic: string
+  category: string
+  difficulty: string
   position: 'FOR' | 'AGAINST'
   round: number
   totalRounds: number
