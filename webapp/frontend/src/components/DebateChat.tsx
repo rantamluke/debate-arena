@@ -12,12 +12,14 @@ interface Message {
 interface DebateChatProps {
   messages: Message[]
   onSendMessage: (content: string) => void
+  onEndDebate?: () => void
   userPosition?: 'FOR' | 'AGAINST'
   currentRound?: number
   totalRounds?: number
+  canEndDebate?: boolean
 }
 
-export default function DebateChat({ messages, onSendMessage, userPosition = 'FOR', currentRound = 1, totalRounds = 4 }: DebateChatProps) {
+export default function DebateChat({ messages, onSendMessage, onEndDebate, userPosition = 'FOR', currentRound = 1, totalRounds = 4, canEndDebate = false }: DebateChatProps) {
   const [inputValue, setInputValue] = useState('')
   const [isOpponentTyping, setIsOpponentTyping] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState(90)
@@ -86,31 +88,47 @@ export default function DebateChat({ messages, onSendMessage, userPosition = 'FO
 
       {/* Input Area */}
       <div className="border-t border-white/10 p-4">
-        <div className="flex gap-3">
-          <button
-            onClick={handleVoice}
-            className="px-4 py-3 bg-red-500 hover:bg-red-600 rounded-xl transition flex items-center gap-2"
-          >
-            🎤 Voice
-          </button>
-          <input
-            type="text"
-            placeholder="Type your argument (or use voice)..."
-            value={inputValue}
-            onChange={e => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-purple-500 transition text-white placeholder-gray-400"
-          />
-          <button
-            onClick={handleSend}
-            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl font-bold transition"
-          >
-            Send
-          </button>
-        </div>
-        <div className="text-xs text-gray-400 mt-2 text-center">
-          ⏱️ {timeRemaining} seconds remaining for your rebuttal
-        </div>
+        {canEndDebate ? (
+          <div className="space-y-3">
+            <div className="text-center text-sm text-gray-300">
+              All rounds complete! Review the arguments and end the debate when ready.
+            </div>
+            <button
+              onClick={onEndDebate}
+              className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-xl font-bold text-lg transition"
+            >
+              🏁 End Debate & Get Judge Scores
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="flex gap-3">
+              <button
+                onClick={handleVoice}
+                className="px-4 py-3 bg-red-500 hover:bg-red-600 rounded-xl transition flex items-center gap-2"
+              >
+                🎤 Voice
+              </button>
+              <input
+                type="text"
+                placeholder="Type your argument (or use voice)..."
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-purple-500 transition text-white placeholder-gray-400"
+              />
+              <button
+                onClick={handleSend}
+                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl font-bold transition"
+              >
+                Send
+              </button>
+            </div>
+            <div className="text-xs text-gray-400 mt-2 text-center">
+              ⏱️ {timeRemaining} seconds remaining for your rebuttal
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

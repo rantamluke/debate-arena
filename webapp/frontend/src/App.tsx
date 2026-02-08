@@ -80,7 +80,7 @@ function App() {
   }
 
   const handleSendMessage = async (content: string) => {
-    if (!debateId || debateEnding) return
+    if (!debateId) return
     
     const newMessage: Message = {
       id: Date.now().toString(),
@@ -102,19 +102,12 @@ function App() {
       
       setMessages(prev => [...prev, opponentMessage])
       
-      // Update round counter and check if debate is complete
+      // Update round counter
       const newRound = currentTopic.round + 1
       setCurrentTopic((prev: any) => ({
         ...prev,
         round: newRound
       }))
-      
-      // Check if debate is complete (after both user and AI have argued)
-      // We've just added the AI's response, so check if we've reached total rounds
-      if (newRound > currentTopic.totalRounds && !debateEnding) {
-        setDebateEnding(true)
-        setTimeout(() => handleEndDebate(), 2000)
-      }
     } catch (error) {
       console.error('Failed to send message:', error)
       alert('Failed to send message. Please try again.')
@@ -122,11 +115,12 @@ function App() {
   }
 
   const handleEndDebate = async () => {
-    if (!debateId || debateEnding === false) return
+    if (!debateId) return
     
     // Prevent multiple calls
-    if (showResults) return
+    if (showResults || debateEnding) return
     
+    setDebateEnding(true)
     setLoading(true)
     try {
       const results = await endDebate(debateId, messages)
@@ -244,9 +238,11 @@ function App() {
                 <DebateChat 
                   messages={messages}
                   onSendMessage={handleSendMessage}
+                  onEndDebate={handleEndDebate}
                   userPosition={currentTopic?.position}
                   currentRound={currentTopic?.round}
                   totalRounds={currentTopic?.totalRounds}
+                  canEndDebate={currentTopic?.round > currentTopic?.totalRounds}
                 />
               </div>
             </div>
