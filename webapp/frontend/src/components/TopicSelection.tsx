@@ -24,9 +24,11 @@ export default function TopicSelection({ onSelectTopic }: TopicSelectionProps) {
   const loadTopics = async () => {
     try {
       const data = await getTopics();
+      console.log('Loaded topics:', data);
       setTopics(data);
     } catch (error) {
       console.error('Failed to load topics:', error);
+      alert('Failed to load topics from backend. Please check if the backend is running.');
     } finally {
       setLoading(false);
     }
@@ -39,8 +41,15 @@ export default function TopicSelection({ onSelectTopic }: TopicSelectionProps) {
   };
 
   const handleRandom = () => {
+    if (topics.length === 0) {
+      console.error('No topics available');
+      alert('Topics not loaded yet. Please wait or try again.');
+      return;
+    }
+    
     const randomTopic = topics[Math.floor(Math.random() * topics.length)];
-    const randomPosition = Math.random() > 0.5 ? 'FOR' : 'AGAINST';
+    const randomPosition: 'FOR' | 'AGAINST' = Math.random() > 0.5 ? 'FOR' : 'AGAINST';
+    console.log('Random selection:', randomTopic, randomPosition);
     onSelectTopic(randomTopic.id, randomPosition);
   };
 

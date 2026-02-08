@@ -4,6 +4,8 @@
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
+console.log('API_URL configured as:', API_URL);
+
 export interface Topic {
   id: number
   topic: string
@@ -77,8 +79,16 @@ class APIClient {
     if (difficulty) params.append('difficulty', difficulty)
     
     const url = `${this.baseUrl}/api/topics${params.toString() ? '?' + params.toString() : ''}`
+    console.log('Fetching topics from:', url)
+    
     const response = await fetch(url)
-    return response.json()
+    if (!response.ok) {
+      throw new Error(`Failed to fetch topics: ${response.status} ${response.statusText}`)
+    }
+    
+    const data = await response.json()
+    console.log('Topics response:', data)
+    return data
   }
 
   async startDebate(topicId: number, position?: 'FOR' | 'AGAINST'): Promise<DebateSession> {
