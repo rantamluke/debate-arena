@@ -287,11 +287,12 @@ app.get('/api/stats', (req, res) => {
 
 // Mock responses for when AI is not configured
 function getMockOpponentResponse(roundNumber: number): string {
+  // Generic debate responses that work for any topic
   const responses = [
-    "While automation is advancing, history shows technology creates new jobs as it eliminates old ones. The Industrial Revolution automated farming but created factory jobs. The digital revolution eliminated typists but created software developers. We're not seeing mass unemployment—we're seeing job transformation. AI will augment human workers, not replace them entirely.",
-    "Your points about historical job creation are valid for previous technological shifts, but AI is fundamentally different. Unlike past automation that replaced physical labor, AI can replicate cognitive tasks—the very thing that made humans irreplaceable. When AI can write, analyze, create art, and make decisions, what uniquely human skills remain in the job market?",
-    "The human elements of creativity, emotional intelligence, ethical judgment, and complex problem-solving in ambiguous situations remain beyond AI's reach. AI excels at pattern recognition and optimization within defined parameters, but struggles with novel situations requiring genuine understanding. The jobs of 2030 will require these uniquely human capabilities, with AI as a tool to enhance productivity.",
-    "That's a compelling argument about human uniqueness, but it assumes AI capabilities will plateau. Current AI development shows rapid advancement in creative tasks, emotional analysis, and even ethical reasoning. If AI continues this trajectory, the 'uniquely human' capabilities you mention may not remain exclusive for long. We must prepare for a future where human cognitive advantage narrows significantly."
+    "That's an interesting perspective, but I think we need to look at this from a different angle. Historical evidence suggests that your position oversimplifies a complex issue. There are numerous counterexamples and nuances that challenge your core assumptions.",
+    "I appreciate your arguments, but you're missing some critical considerations. The evidence you cite doesn't account for long-term consequences and alternative viewpoints. Let me present a different interpretation of the same facts that supports my position.",
+    "Your reasoning has some merit, but it fails to address the fundamental trade-offs involved. Every policy or position has costs and benefits. The question isn't whether your concerns are valid—they are—but whether the alternative is worse. In this case, I believe it is.",
+    "You make compelling points, but they rest on assumptions that I challenge. The world is changing rapidly, and what worked in the past may not apply today. We need to think beyond traditional frameworks and consider emerging realities that reshape this entire debate."
   ];
   
   return responses[Math.min(roundNumber - 1, responses.length - 1)];
