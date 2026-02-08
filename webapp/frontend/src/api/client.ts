@@ -142,6 +142,12 @@ class APIClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ debateId, messages })
     })
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || `Failed to end debate: ${response.status}`);
+    }
+    
     return response.json()
   }
 

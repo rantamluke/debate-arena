@@ -7,9 +7,10 @@ interface Message {
 
 interface MessageBubbleProps {
   message: Message
+  userPosition?: 'FOR' | 'AGAINST'
 }
 
-export default function MessageBubble({ message }: MessageBubbleProps) {
+export default function MessageBubble({ message, userPosition = 'FOR' }: MessageBubbleProps) {
   if (message.type === 'system') {
     return (
       <div className="text-center message">
@@ -22,6 +23,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 
   const isUser = message.type === 'user'
   const timeAgo = getTimeAgo(message.timestamp)
+  const opponentPosition = userPosition === 'FOR' ? 'AGAINST' : 'FOR'
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} message`}>
@@ -34,7 +36,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
           }`}
         >
           <div className={`text-xs mb-1 ${isUser ? 'text-purple-200' : 'text-gray-400'}`}>
-            {isUser ? 'You (FOR)' : 'AI Opponent (AGAINST)'}
+            {isUser ? `You (${userPosition})` : `AI Opponent (${opponentPosition})`}
           </div>
           <p className="text-base leading-relaxed">{message.content}</p>
         </div>

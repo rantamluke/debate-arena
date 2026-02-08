@@ -98,14 +98,16 @@ function App() {
       
       setMessages(prev => [...prev, opponentMessage])
       
-      // Update round counter
+      // Update round counter and check if debate is complete
+      const newRound = currentTopic.round + 1
       setCurrentTopic((prev: any) => ({
         ...prev,
-        round: prev.round + 1
+        round: newRound
       }))
       
-      // Check if debate is complete
-      if (currentTopic.round >= currentTopic.totalRounds) {
+      // Check if debate is complete (after both user and AI have argued)
+      // We've just added the AI's response, so check if we've reached total rounds
+      if (newRound > currentTopic.totalRounds) {
         setTimeout(() => handleEndDebate(), 2000)
       }
     } catch (error) {
@@ -254,6 +256,7 @@ ${i + 1}. ${j.name}
               <DebateChat 
                 messages={messages}
                 onSendMessage={handleSendMessage}
+                userPosition={currentTopic?.position}
               />
             </div>
           </div>

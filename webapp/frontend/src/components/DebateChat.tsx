@@ -12,9 +12,10 @@ interface Message {
 interface DebateChatProps {
   messages: Message[]
   onSendMessage: (content: string) => void
+  userPosition?: 'FOR' | 'AGAINST'
 }
 
-export default function DebateChat({ messages, onSendMessage }: DebateChatProps) {
+export default function DebateChat({ messages, onSendMessage, userPosition = 'FOR' }: DebateChatProps) {
   const [inputValue, setInputValue] = useState('')
   const [isOpponentTyping, setIsOpponentTyping] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState(90)
@@ -61,7 +62,7 @@ export default function DebateChat({ messages, onSendMessage }: DebateChatProps)
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.map(message => (
-          <MessageBubble key={message.id} message={message} />
+          <MessageBubble key={message.id} message={message} userPosition={userPosition} />
         ))}
         
         {isOpponentTyping && <TypingIndicator />}
