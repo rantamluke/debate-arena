@@ -33,7 +33,7 @@ function App() {
     }
   ])
 
-  const [currentTopic, setCurrentTopic] = useState({
+  const [currentTopic] = useState({
     title: 'AI will replace most jobs by 2030',
     category: 'Technology',
     difficulty: 'Beginner' as const,
@@ -42,7 +42,7 @@ function App() {
     totalRounds: 4
   })
 
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     elo: 1247,
     winRate: 67,
     totalDebates: 24,
