@@ -169,40 +169,13 @@ function App() {
     )
   }
 
-  // Navigation component
-  const Navigation = () => (
-    <div className="flex justify-center gap-4 mb-6">
-      <button
-        onClick={() => setView('home')}
-        className={`px-6 py-3 rounded-lg font-semibold transition ${
-          view === 'home'
-            ? 'bg-gradient-to-r from-purple-600 to-blue-600'
-            : 'bg-gray-800 hover:bg-gray-700'
-        }`}
-      >
-        🥊 New Debate
-      </button>
-      <button
-        onClick={() => setView('stats')}
-        className={`px-6 py-3 rounded-lg font-semibold transition ${
-          view === 'stats'
-            ? 'bg-gradient-to-r from-purple-600 to-blue-600'
-            : 'bg-gray-800 hover:bg-gray-700'
-        }`}
-      >
-        📊 Stats
-      </button>
-    </div>
-  );
-
   // Stats view
   if (view === 'stats') {
     return (
       <>
         <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
-          <Header elo={stats.elo} onStatsClick={() => setView("stats")} />
+          <Header elo={stats.elo} onStatsClick={() => setView("stats")} onNewDebateClick={() => setView("home")} />
           <div className="max-w-7xl mx-auto px-4 py-6">
-            <Navigation />
             <StatsPage />
           </div>
         </div>
@@ -222,10 +195,9 @@ function App() {
     return (
       <>
         <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
-          <Header elo={stats.elo} onStatsClick={() => setView("stats")} />
+          <Header elo={stats.elo} onStatsClick={() => setView("stats")} onNewDebateClick={() => setView("home")} />
           
           <div className="max-w-7xl mx-auto px-4 py-6">
-            <Navigation />
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <TopicSidebar 
@@ -263,9 +235,8 @@ function App() {
   return (
     <>
       <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
-        <Header elo={stats.elo} onStatsClick={() => setView("stats")} />
+        <Header elo={stats.elo} onStatsClick={() => setView("stats")} onNewDebateClick={() => setView("home")} />
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <Navigation />
           <TopicSelection onSelectTopic={handleSelectTopic} />
         </div>
       </div>
