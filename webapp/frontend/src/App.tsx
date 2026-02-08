@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import DebateChat from './components/DebateChat'
 import TopicSidebar from './components/TopicSidebar'
-import NewDebateButton from './components/NewDebateButton'
+import TopicSelection from './components/TopicSelection'
+import { startDebate, sendMessage, endDebate, getStats } from './api/client'
 
 interface Message {
   id: string
@@ -12,74 +13,189 @@ interface Message {
 }
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      type: 'system',
-      content: '🎯 Round 1 - Opening Statement',
-      timestamp: Date.now() - 120000
-    },
-    {
-      id: '2',
-      type: 'user',
-      content: 'AI and automation are already transforming industries at an unprecedented rate. Look at autonomous vehicles, automated customer service, and algorithmic trading. By 2030, we\'ll see mass adoption across sectors that currently employ millions. This isn\'t fear-mongering—it\'s recognizing the exponential pace of technological advancement.',
-      timestamp: Date.now() - 120000
-    },
-    {
-      id: '3',
-      type: 'opponent',
-      content: 'While automation is advancing, history shows technology creates new jobs as it eliminates old ones. The Industrial Revolution automated farming but created factory jobs. The digital revolution eliminated typists but created software developers. We\'re not seeing mass unemployment—we\'re seeing job transformation. AI will augment human workers, not replace them entirely.',
-      timestamp: Date.now() - 10000
+  const [debateActive, setDebateActive] = useState(false)
+  const [debateId, setDebateId] = useState<string | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [currentTopic, setCurrentTopic] = useState<any>(null)
+  const [stats, setStats] = useState({
+    elo: 1000,
+    winRate: 0,
+    totalDebates: 0,
+    currentStreak: 0
+  })
+  const [loading, setLoading] = useState(false)
+
+  // Load stats on mount
+  useEffect(() => {
+    loadStats()
+  }, [])
+
+  const loadStats = async () => {
+    try {
+      const data = await getStats()
+      setStats(data)
+    } catch (error) {
+      console.error('Failed to load stats:', error)
     }
-  ])
+  }
 
-  const [currentTopic] = useState({
-    title: 'AI will replace most jobs by 2030',
-    category: 'Technology',
-    difficulty: 'Beginner' as const,
-    position: 'FOR' as const,
-    round: 2,
-    totalRounds: 4
-  })
+  const handleSelectTopic = async (topicId: number, position: 'FOR' | 'AGAINST') => {
+    setLoading(true)
+    try {
+      const debate = await startDebate(topicId, position)
+      
+      setDebateId(debate.id)
+      setCurrentTopic({
+        title: debate.topic,
+        category: debate.category,
+        difficulty: debate.difficulty,
+        position: debate.position,
+        round: debate.round,
+        totalRounds: debate.totalRounds
+      })
+      
+      setMessages([{
+        id: '1',
+        type: 'system',
+        content: `🎯 Round ${debate.round} - Opening Statement`,
+        timestamp: Date.now()
+      }])
+      
+      setDebateActive(true)
+    } catch (error) {
+      console.error('Failed to start debate:', error)
+      alert('Failed to start debate. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const [stats] = useState({
-    elo: 1247,
-    winRate: 67,
-    totalDebates: 24,
-    currentStreak: 5
-  })
-
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = async (content: string) => {
+    if (!debateId) return
+    
     const newMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
       content,
       timestamp: Date.now()
     }
-    setMessages([...messages, newMessage])
+    setMessages(prev => [...prev, newMessage])
 
-    // TODO: Send to backend and get opponent response
-    setTimeout(() => {
+    try {
+      const response = await sendMessage(debateId, content)
+      
       const opponentMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: response.id,
         type: 'opponent',
-        content: 'Interesting point. However, I would argue that...',
+        content: response.content,
+        timestamp: response.timestamp
+      }
+      
+      setMessages(prev => [...prev, opponentMessage])
+      
+      // Update round counter
+      setCurrentTopic((prev: any) => ({
+        ...prev,
+        round: prev.round + 1
+      }))
+      
+      // Check if debate is complete
+      if (currentTopic.round >= currentTopic.totalRounds) {
+        setTimeout(() => handleEndDebate(), 2000)
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error)
+      alert('Failed to send message. Please try again.')
+    }
+  }
+
+  const handleEndDebate = async () => {
+    if (!debateId) return
+    
+    setLoading(true)
+    try {
+      const results = await endDebate(debateId, messages)
+      
+      // Show results
+      const resultsMessage: Message = {
+        id: 'results',
+        type: 'system',
+        content: formatResults(results),
         timestamp: Date.now()
       }
-      setMessages(prev => [...prev, opponentMessage])
-    }, 2000)
+      
+      setMessages(prev => [...prev, resultsMessage])
+      
+      // Reload stats
+      await loadStats()
+      
+      // Show new debate option after a delay
+      setTimeout(() => {
+        if (confirm('Debate complete! Start a new one?')) {
+          handleNewDebate()
+        }
+      }, 3000)
+    } catch (error) {
+      console.error('Failed to end debate:', error)
+      alert('Failed to end debate. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const formatResults = (results: any) => {
+    const { judges, averageScores, voteBreakdown, winner, eloChange } = results
+    
+    return `🏆 **DEBATE COMPLETE!**
+
+**Winner:** ${winner === 'user' ? 'YOU WIN! 🎉' : winner === 'opponent' ? 'Opponent Wins' : 'TIE'}
+
+**Judge Votes:**
+Human: ${voteBreakdown.human} | AI: ${voteBreakdown.ai} | Tie: ${voteBreakdown.tie}
+
+**Average Scores:**
+Logic: ${averageScores.logic}/10
+Evidence: ${averageScores.evidence}/10
+Rhetoric: ${averageScores.rhetoric}/10
+
+**Elo Change:** ${eloChange > 0 ? '+' : ''}${eloChange}
+
+**Judge Feedback:**
+${judges.map((j: any, i: number) => `
+${i + 1}. ${j.name}
+   Logic: ${j.scores.logic} | Evidence: ${j.scores.evidence} | Rhetoric: ${j.scores.rhetoric}
+   "${j.feedback}"`).join('\n')}
+`
   }
 
   const handleNewDebate = () => {
-    // TODO: Implement new debate flow
-    console.log('Starting new debate...')
+    setDebateActive(false)
+    setDebateId(null)
+    setMessages([])
+    setCurrentTopic(null)
   }
 
   const handleForfeit = () => {
     if (confirm('Are you sure you want to forfeit this debate?')) {
-      // TODO: Implement forfeit logic
-      console.log('Debate forfeited')
+      handleNewDebate()
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white flex items-center justify-center">
+        <div className="text-2xl">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!debateActive) {
+    return (
+      <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
+        <Header elo={stats.elo} />
+        <TopicSelection onSelectTopic={handleSelectTopic} />
+      </div>
+    )
   }
 
   return (
@@ -100,8 +216,6 @@ function App() {
           />
         </div>
       </div>
-
-      <NewDebateButton onClick={handleNewDebate} />
     </div>
   )
 }

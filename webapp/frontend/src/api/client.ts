@@ -107,9 +107,16 @@ class APIClient {
   }
 
   async getStats(userId: string = 'default'): Promise<UserStats> {
-    const response = await fetch(`${this.baseUrl}/api/stats/${userId}`)
+    const response = await fetch(`${this.baseUrl}/api/stats?userId=${userId}`)
     return response.json()
   }
 }
 
 export const api = new APIClient()
+
+// Export convenience functions
+export const getTopics = (category?: string, difficulty?: string) => api.getTopics(category, difficulty)
+export const startDebate = (topicId: number, position?: 'FOR' | 'AGAINST') => api.startDebate(topicId, position)
+export const sendMessage = (debateId: string, content: string) => api.sendMessage(debateId, content)
+export const endDebate = (debateId: string, messages: Message[]) => api.endDebate(debateId, messages)
+export const getStats = (userId?: string) => api.getStats(userId)
