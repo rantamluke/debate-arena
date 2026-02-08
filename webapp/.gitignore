@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+.pnpm-debug.log*
+
+# Production builds
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Misc
+.cache/

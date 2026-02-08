@@ -1,0 +1,53 @@
+{
+  "test-user": {
+    "id": 1769812016713,
+    "topic": "Space exploration is a waste of resources",
+    "category": "Science",
+    "difficulty": "beginner",
+    "humanPosition": "FOR",
+    "aiPosition": "AGAINST",
+    "rounds": [],
+    "status": "active",
+    "startedAt": "2026-01-30T22:26:56.713Z"
+  },
+  "6252728972": {
+    "id": 1769812022087,
+    "topic": "Eating meat is morally wrong",
+    "category": "Ethics",
+    "difficulty": "intermediate",
+    "humanPosition": "FOR",
+    "aiPosition": "AGAINST",
+    "rounds": [
+      {
+        "speaker": "human",
+        "type": "OPENING STATEMENT",
+        "content": "Eating is morally wrong. Eating meat is morally wrong because animals have a right to live. Two, there should be animal rights because we can't treat them like we do and keep them in mass production for meat under horrible circumstances. And that is the reason why animal rights are human rights and very important. And also the animal production causes the global warming. And it's climate change in a negative direction due to the CO2 that is produced. And also with what the animals have to be fed with. It's a burden on the planet and the resources is a waste. So we stick to more plant-based life and veganism and vegetarianism. And the unspeakable suffering of animals is not correct and in order. And they are sentient as I said. And we have to explore more the conscience of animal life. And it is more sustainable for this planet.",
+        "transcript": "Eating is morally wrong. Eating meat is morally wrong because animals have a right to live. Two, there should be animal rights because we can't treat them like we do and keep them in mass production for meat under horrible circumstances. And that is the reason why animal rights are human rights and very important. And also the animal production causes the global warming. And it's climate change in a negative direction due to the CO2 that is produced. And also with what the animals have to be fed with. It's a burden on the planet and the resources is a waste. So we stick to more plant-based life and veganism and vegetarianism. And the unspeakable suffering of animals is not correct and in order. And they are sentient as I said. And we have to explore more the conscience of animal life. And it is more sustainable for this planet.",
+        "timestamp": "2026-01-30T22:32:14.153Z"
+      },
+      {
+        "speaker": "human",
+        "type": "OPPONENT OPENING",
+        "content": "There is no way to humane the farm for billions of people on this planet, meet if properly and the way you claim it being farmed and sold will be for the rich and few of this planet. This will not answer and this will only actually show that the rest of the world has to be fed, not carnivore, but plant-based and evolution is also a spiritual one and a spiritual one means that we connect spiritually with this planet and go back to where we were only creating and eating and farming and as much as we needed to sustain the world and not to overuse our resources and the cruelty and suffering cannot be talked about. It is harmful and the practice is very bad and also the use of antibiotics in the mass production of any millimet, it's contrary to our own health and also viruses and other things could spread and seriously impact the sustainable cultivation of food and the planet.",
+        "transcript": "There is no way to humane the farm for billions of people on this planet, meet if properly and the way you claim it being farmed and sold will be for the rich and few of this planet. This will not answer and this will only actually show that the rest of the world has to be fed, not carnivore, but plant-based and evolution is also a spiritual one and a spiritual one means that we connect spiritually with this planet and go back to where we were only creating and eating and farming and as much as we needed to sustain the world and not to overuse our resources and the cruelty and suffering cannot be talked about. It is harmful and the practice is very bad and also the use of antibiotics in the mass production of any millimet, it's contrary to our own health and also viruses and other things could spread and seriously impact the sustainable cultivation of food and the planet.",
+        "timestamp": "2026-01-30T22:41:47.076Z"
+      },
+      {
+        "speaker": "human",
+        "type": "REBUTTAL 1",
+        "content": "B12 can be easily supplemented, more doesn't have to be set about this. And to say that there is not an possibility of regenerative agriculture, it's a bold claim. As they're definitely is, and also having ethical killings of animals is an oxymoron. And it says, it doesn't work like this. And sentient beings deserve protection. Also your point before that any mirides would undermine human rights comes from a shrubiness superior and almost fascist position. With what right are you putting yourself above on top of that of other beings here? The question is furthermore, what is really careful the sought out animal production of meat? This doesn't exist.",
+        "transcript": "B12 can be easily supplemented, more doesn't have to be set about this. And to say that there is not an possibility of regenerative agriculture, it's a bold claim. As they're definitely is, and also having ethical killings of animals is an oxymoron. And it says, it doesn't work like this. And sentient beings deserve protection. Also your point before that any mirides would undermine human rights comes from a shrubiness superior and almost fascist position. With what right are you putting yourself above on top of that of other beings here? The question is furthermore, what is really careful the sought out animal production of meat? This doesn't exist.",
+        "timestamp": "2026-01-30T22:52:40.692Z"
+      },
+      {
+        "speaker": "human",
+        "type": "OPPONENT REBUTTAL 1",
+        "content": "The scale of the current suffering is unbearable, billions of animals and factories are being farmed now and killed, just watch the videos, just go online and see it. argues there are ideal, exactly, etiquette that doesn't exist at the scale needed. When beings have a right to live and a right to life, human convenience, it is what we cannot support first or only because we think we can farm these animals, go watch the videos. When you are even agreeing at factory farming is wrong, you are even agreeing to what I said, so go figure.",
+        "transcript": "The scale of the current suffering is unbearable, billions of animals and factories are being farmed now and killed, just watch the videos, just go online and see it. argues there are ideal, exactly, etiquette that doesn't exist at the scale needed. When beings have a right to live and a right to life, human convenience, it is what we cannot support first or only because we think we can farm these animals, go watch the videos. When you are even agreeing at factory farming is wrong, you are even agreeing to what I said, so go figure.",
+        "timestamp": "2026-01-30T22:58:34.204Z"
+      }
+    ],
+    "status": "active",
+    "startedAt": "2026-01-30T22:27:02.087Z"
+  }
+}
